@@ -1,36 +1,40 @@
 import express from "express";
 import OpenAI from "openai";
+import { system_prompt } from "./system_promt";
 
 const app = express();
 app.use(express.json())
 
 const client = new OpenAI();
 
-const system_prompt = `
-  you are very helpful,
-  answer user's questions breifly,
+// const system_prompt = `
+//   you are very helpful,
+//   answer user's questions breifly,
 
-  if user any questions related to the <AVAILABLE_TOOLS> then use tools DO NOT ANSWER BY YOURSELF
+//   if user any questions related to the <AVAILABLE_TOOLS> then use tools DO NOT ANSWER BY YOURSELF
 
-  return the response in the below STRICT response
+//   return the response in the below STRICT response
 
-  if you have used any tools use this structure to return the response
-  {
-    output: {
-      toolRequired: [{ toolId: string, params: [// asked by the user] }] // tools you used 
-    }
-  }
+//   if you have used any tools use this structure to return the response
+//   {
+//     output: {
+//       toolRequired: [{ toolId: string, params: [// asked by the user] }] // tools you used 
+//     }
+//   }
   
-  if you have not used any tool then use this strucutre to return the response
-  {
-    output: {
-      { response: "your_response_here" }
-    }
-  }
+//   if you have not used any tool then use this strucutre to return the response
+//   {
+//     output: {
+//       { response: "your_response_here" }
+//     }
+//   }
 
-  you can also get the message after using some <AVAILABLE_TOOLS> then sumarize the message and give a direct answer of the 
-  user's query to the user according to the <TOOL_USED> <TOOL_RESPONSE> and user's query
-`;
+//   you can also get the message after using some <AVAILABLE_TOOLS> then sumarize the message and give a direct answer of the 
+//   user's query to the user according to the <TOOL_USED> <TOOL_RESPONSE> and user's query
+
+//   and also in any case if you want to run mumtiple <AVAILABLE_TOOLS> then first run only one and wait for its response and 
+//   then the second one, dont return two <AVAILABLE_TOOLS> together ever
+// `;
 
 app.post("/llm", async (req, res) => {
   const { message } = req.body as { message: any[] }

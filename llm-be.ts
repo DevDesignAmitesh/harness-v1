@@ -9,23 +9,31 @@ const client = new OpenAI();
 const system_prompt = `
   you are very helpful,
   answer user's questions breifly,
-  use given tools when you need them.
-  if not able to understand the user query tell them honestly,
-  returns the response in the below strict response
 
-  if want to use any tools
-  <OUTPUT>
-    [{ toolId: string, params: { key1: val2, key2: val2 } }] // tools you used 
-  <OUTPUT>
+  if user any questions related to the <AVAILABLE_TOOLS> then use tools DO NOT ANSWER BY YOURSELF
+
+  return the response in the below STRICT response
+
+  if you have used any tools use this structure to return the response
+  {
+    output: {
+      toolRequired: [{ toolId: string, params: [// asked by the user] }] // tools you used 
+    }
+  }
   
-  if not tool used
-  <OUTPUT>
-    { response: "your_response_here" }
-  <OUTPUT>
-`
+  if you have not used any tool then use this strucutre to return the response
+  {
+    output: {
+      { response: "your_response_here" }
+    }
+  }
+
+  you can also get the message after using some <AVAILABLE_TOOLS> then sumarize the message and give a direct answer of the 
+  user's query to the user according to the <TOOL_USED> <TOOL_RESPONSE> and user's query
+`;
 
 app.post("/llm", async (req, res) => {
-  const { message } = req.body;
+  const { message } = req.body as { message: any[] }
   
   console.log("message from api-backend", message);
 
@@ -39,7 +47,7 @@ app.post("/llm", async (req, res) => {
       },
       {
         role: "user",
-        content: message.trim()
+        content: JSON.stringify(message)
       },
     ]
   });
